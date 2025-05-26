@@ -1,44 +1,52 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton
+from data.data_manager import find_user
 
 class LoginScreen(QWidget):
-    def __init__(self, login_success_callback, back_callback):
+    def __init__(self, login_callback, back_callback):
         super().__init__()
-        self.login_success_callback = login_success_callback
+        self.login_callback = login_callback
         self.back_callback = back_callback
+        self.setup_ui()
 
+    def setup_ui(self):
         layout = QVBoxLayout()
 
-        layout.addWidget(QLabel("Email:"))
         self.email_input = QLineEdit()
+        self.email_input.setPlaceholderText("Email")
         layout.addWidget(self.email_input)
 
-        layout.addWidget(QLabel("Password:"))
         self.password_input = QLineEdit()
+        self.password_input.setPlaceholderText("Password")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
         layout.addWidget(self.password_input)
 
-        login_button = QPushButton("Log In")
-        login_button.clicked.connect(self.handle_login)
-        layout.addWidget(login_button)
+        login_btn = QPushButton("Login")
+        login_btn.clicked.connect(self.login)
+        layout.addWidget(login_btn)
 
-        back_button = QPushButton("Back")
-        back_button.clicked.connect(self.back_callback)
-        layout.addWidget(back_button)
+        back_btn = QPushButton("Back")
+        back_btn.clicked.connect(self.back_callback)
+        layout.addWidget(back_btn)
 
         self.setLayout(layout)
 
-    def handle_login(self):
-        from data.data_manager import find_user  # local import to avoid circular imports
-        email = self.email_input.text().strip()
-        password = self.password_input.text().strip()
+    def login(self):
+        email = self.email_input.text()
+        password = self.password_input.text()
 
-        if not email or not password:
-            QMessageBox.warning(self, "Input Error", "Please fill in all fields.")
+        # Önce doktor olarak ara
+        user = find_user(email, password, "doctor")
+        if user:
+            self.login_callback(user)
             return
 
-        user = find_user(email, password)
+        # Eğer doktor bulunmazsa hasta olarak ara
+        user = find_user(email, password, "patient")
         if user:
-            QMessageBox.information(self, "Login Success", f"Welcome {user['type'].capitalize()}!")
-            self.login_success_callback(user)
-        else:
-            QMessageBox.warning(self, "Login Failed", "Incorrect email or password.")
+            self.login_callback(user)
+            return
+
+        # Hatalı giriş
+        self.email_input.setText("")
+        self.password_input.setText("")
+        self.email_input.setPlaceholderText("Invalid credentials")

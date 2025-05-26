@@ -1,4 +1,5 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QPushButton
+from data.data_manager import save_user
 
 class DoctorRegistration(QWidget):
     def __init__(self, submit_callback, back_callback):
@@ -40,6 +41,9 @@ class DoctorRegistration(QWidget):
             "password": self.password_input.text(),
             "type": "doctor"
         }
-        from data.data_manager import save_user
-        save_user(doctor_data)
-        self.submit_callback()
+
+        # Kayıt işlemi
+        save_user("doctor", doctor_data)
+
+        # Dashboard'a yönlendirme
+        self.submit_callback(doctor_data)

@@ -2,11 +2,11 @@ from PyQt6.QtWidgets import QWidget
 from PyQt6.QtGui import QPainter, QColor, QPen, QFont
 from PyQt6.QtCore import QRectF, Qt
 
-class PatientDashboard(QWidget):
+class DoctorDashboard(QWidget):
     def __init__(self, user_data):
         super().__init__()
-        self.setFixedSize(400, 600)
-        self.setWindowTitle("Smart Hydrogel - Patient Dashboard")
+        self.setFixedSize(400, 300)
+        self.setWindowTitle("Smart Hydrogel - Doctor Dashboard")
         self.user_data = user_data  # JSON'dan gelen kullanıcı verisi
 
     def paintEvent(self, event):
@@ -14,7 +14,7 @@ class PatientDashboard(QWidget):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.fillRect(self.rect(), QColor("#fefefe"))
 
-        container_rect = QRectF(20, 20, 360, 560)
+        container_rect = QRectF(20, 20, 360, 260)
         painter.setBrush(QColor("white"))
         painter.setPen(Qt.PenStyle.NoPen)
         painter.drawRoundedRect(container_rect, 20, 20)
@@ -25,27 +25,17 @@ class PatientDashboard(QWidget):
         painter.drawText(QRectF(30, 30, 300, 40), Qt.AlignmentFlag.AlignLeft, "SMART HYDROGEL")
 
         # Avatar
-        painter.setBrush(QColor("#d6eaf8"))
+        painter.setBrush(QColor("#aed6f1"))
         painter.drawEllipse(30, 80, 60, 60)
 
-        # Name & condition
+        # Name & Type
         painter.setPen(Qt.GlobalColor.black)
         painter.setFont(QFont("Arial", 12, QFont.Weight.Bold))
         painter.drawText(QRectF(100, 85, 250, 30), Qt.AlignmentFlag.AlignLeft, self.user_data.get("name", "N/A"))
         painter.setFont(QFont("Arial", 10))
-        painter.drawText(QRectF(100, 110, 250, 30), Qt.AlignmentFlag.AlignLeft, self.user_data.get("condition", "N/A"))
+        painter.drawText(QRectF(100, 110, 250, 30), Qt.AlignmentFlag.AlignLeft, "Doctor")
 
-        # Edit button
-        painter.setBrush(Qt.BrushStyle.NoBrush)
-        painter.setPen(QPen(QColor("#00a0b0"), 2))
-        painter.drawRoundedRect(QRectF(280, 90, 60, 30), 10, 10)
-        painter.drawText(QRectF(280, 90, 60, 30), Qt.AlignmentFlag.AlignCenter, "Edit")
-
-        # Section Title
-        painter.setPen(QPen(Qt.GlobalColor.black))
-        painter.setFont(QFont("Arial", 11, QFont.Weight.Bold))
-        painter.drawText(QRectF(30, 160, 300, 30), Qt.AlignmentFlag.AlignLeft, "DRUG RELEASE MONITORING")
-
+        # Info cards
         def draw_card(x, y, title, value):
             painter.setBrush(QColor("#f6f6f6"))
             painter.setPen(Qt.PenStyle.NoPen)
@@ -56,16 +46,5 @@ class PatientDashboard(QWidget):
             painter.setFont(QFont("Arial", 11, QFont.Weight.Bold))
             painter.drawText(QRectF(x+10, y+25, 130, 30), Qt.AlignmentFlag.AlignLeft, value)
 
-        draw_card(30, 200, "AGE", self.user_data.get("age", "N/A"))
-        draw_card(220, 200, "GENDER", self.user_data.get("gender", "N/A"))
-        draw_card(30, 270, "HYDROGEL TYPE", self.user_data.get("hydrogel", "N/A"))
-        draw_card(220, 270, "START DATE", self.user_data.get("start_date", "N/A"))
-        draw_card(30, 340, "EMERGENCY", self.user_data.get("emergency_contact", "N/A"))
-
-        # Adjust Release Button
-        painter.setBrush(QColor("#00a0b0"))
-        painter.setPen(Qt.PenStyle.NoPen)
-        painter.drawRoundedRect(QRectF(30, 420, 320, 50), 20, 20)
-        painter.setPen(Qt.GlobalColor.white)
-        painter.setFont(QFont("Arial", 12, QFont.Weight.Bold))
-        painter.drawText(QRectF(30, 420, 320, 50), Qt.AlignmentFlag.AlignCenter, "ADJUST RELEASE")
+        draw_card(30, 160, "EMAIL", self.user_data.get("email", "N/A"))
+        draw_card(220, 160, "USER TYPE", self.user_data.get("type", "N/A"))
